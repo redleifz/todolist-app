@@ -4,19 +4,33 @@ import { v4 as uuidv4} from "uuid"
 import List from "./components/List";
 import Alert from "./components/Alert";
 
+
 function App() {
 
   const [name,setName] = useState("")
   const [list,setList] = useState([])
   const [alert,setAlert] = useState({show:false,msg:'',type:''})
   const [checkEditItem,setCheckEditItem] = useState(false)
+  const [editId,setEditId] = useState(null)
 
   const submitData =(e)=>{
     e.preventDefault();
     if(!name){
       setAlert({show:true,msg:'Please fill something',type:'error'})
       //alert something
-    }else{
+    }else if(checkEditItem && name){
+      const result = list.map((item) =>{
+        if(item.id === editId){
+            return {...item,title:name}
+        }
+        return item
+      })
+      setList(result);
+      setName('');
+      setCheckEditItem(false);
+      setEditId(null);
+      setAlert({show:true,msg:"Edit Complate",type:"success"})
+     } else {
       const newItem ={
         id:uuidv4() ,
         title: name
@@ -24,8 +38,7 @@ function App() {
       setList([...list,newItem])
       setName('')
       setAlert({show:true,msg:'Input Successful',type:'success'})
-    }
-    
+    }  
  }
 
 const removeItem=(id)=>{
@@ -34,10 +47,13 @@ const removeItem=(id)=>{
 }
 
 const editItem=(id)=>{
-  setCheckEditItem(true)
-  //list.find
-
+  setCheckEditItem(true);
+  setEditId(id)
+  const searchItem = list.find((item)=> item.id === id)
+  setName(searchItem.title)
 }
+
+
 
   return (
     <section className="container">
